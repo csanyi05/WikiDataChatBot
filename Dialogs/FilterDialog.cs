@@ -13,8 +13,8 @@ namespace WikiDataHelpDeskBot.Dialogs
 {
     public class FilterDialog : ComponentDialog
     {
-        private readonly FlightBookingRecognizer _luisRecognizer;
-        public FilterDialog(FlightBookingRecognizer luisRecognizer)
+        private readonly WikiDataHelpDeskRecognizer _luisRecognizer;
+        public FilterDialog(WikiDataHelpDeskRecognizer luisRecognizer)
             : base(nameof(FilterDialog))
         {
             _luisRecognizer = luisRecognizer;
@@ -55,7 +55,8 @@ namespace WikiDataHelpDeskBot.Dialogs
                         if (attributeName != null && attributeValue != null)
                         {
                             if (searchParameters != null)
-                                searchParameters.Filters.Add(attributeName, attributeValue);
+                                if (!searchParameters.Filters.TryAdd(attributeName, attributeValue))
+                                    searchParameters.Filters[attributeName] = attributeValue;
                         }
 
                         return await stepContext.ReplaceDialogAsync(nameof(FilterDialog), searchParameters, cancellationToken);

@@ -9,11 +9,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace WikiDataHelpDeskBot
 {
-    public class FlightBookingRecognizer : IRecognizer
+    public class WikiDataHelpDeskRecognizer : IRecognizer
     {
         private readonly LuisRecognizer _recognizer;
 
-        public FlightBookingRecognizer(IConfiguration configuration)
+        public WikiDataHelpDeskRecognizer(IConfiguration configuration)
         {
             var luisIsConfigured = !string.IsNullOrEmpty(configuration["LuisAppId"]) && !string.IsNullOrEmpty(configuration["LuisAPIKey"]) && !string.IsNullOrEmpty(configuration["LuisAPIHostName"]);
             if (luisIsConfigured)
