@@ -14,9 +14,9 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 
-using TutorialBot.CognitiveModels;
+using WikiDataHelpDeskBot.CognitiveModels;
 
-namespace TutorialBot.Dialogs
+namespace WikiDataHelpDeskBot.Dialogs
 {
     public class MainDialog : ComponentDialog
     {

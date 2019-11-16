@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
 
-namespace TutorialBot.CognitiveModels
+namespace WikiDataHelpDeskBot.CognitiveModels
 {
     public partial class FlightBooking : IRecognizerConvert
     {

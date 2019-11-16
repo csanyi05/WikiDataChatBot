@@ -3,7 +3,7 @@
 
 using System.Linq;
 
-namespace TutorialBot.CognitiveModels
+namespace WikiDataHelpDeskBot.CognitiveModels
 {
     // Extends the partial FlightBooking class with methods and properties that simplify accessing entities in the luis results
     public partial class FlightBooking

@@ -3,7 +3,7 @@
 //
 // Generated with Bot Builder V4 SDK Template for Visual Studio CoreBot v4.6.2
 
-namespace TutorialBot
+namespace WikiDataHelpDeskBot
 {
     public class BookingDetails
     {

@@ -13,7 +13,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace TutorialBot.Bots
+namespace WikiDataHelpDeskBot.Bots
 {
     public class DialogAndWelcomeBot<T> : DialogBot<T>
         where T : Dialog
@@ -42,7 +42,7 @@ namespace TutorialBot.Bots
         // Load attachment from embedded resource.
         private Attachment CreateAdaptiveCardAttachment()
         {
-            var cardResourcePath = "TutorialBot.Cards.welcomeCard.json";
+            var cardResourcePath = "WikiDataHelpDeskBot.Cards.welcomeCard.json";
 
             using (var stream = GetType().Assembly.GetManifestResourceStream(cardResourcePath))
             {

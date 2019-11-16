@@ -7,7 +7,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Extensions.Configuration;
 
-namespace TutorialBot
+namespace WikiDataHelpDeskBot
 {
     public class FlightBookingRecognizer : IRecognizer
     {

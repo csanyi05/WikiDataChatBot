@@ -10,7 +10,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 
-namespace TutorialBot.Dialogs
+namespace WikiDataHelpDeskBot.Dialogs
 {
     public class BookingDialog : CancelAndHelpDialog
     {

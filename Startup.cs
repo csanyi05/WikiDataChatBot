@@ -10,10 +10,10 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.DependencyInjection;
 
-using TutorialBot.Bots;
-using TutorialBot.Dialogs;
+using WikiDataHelpDeskBot.Bots;
+using WikiDataHelpDeskBot.Dialogs;
 
-namespace TutorialBot
+namespace WikiDataHelpDeskBot
 {
     public class Startup
     {

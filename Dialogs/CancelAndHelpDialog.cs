@@ -9,7 +9,7 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 
-namespace TutorialBot.Dialogs
+namespace WikiDataHelpDeskBot.Dialogs
 {
     public class CancelAndHelpDialog : ComponentDialog
     {

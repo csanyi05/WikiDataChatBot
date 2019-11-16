@@ -7,7 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace TutorialBot
+namespace WikiDataHelpDeskBot
 {
     public class Program
     {
