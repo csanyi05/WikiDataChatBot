@@ -1,0 +1,263 @@
+{
+  "luis_schema_version": "4.0.0",
+  "versionId": "0.1",
+  "name": "WikiDataHelpDeskBot",
+  "desc": "WikiDataHelpDeskBot",
+  "culture": "en-us",
+  "tokenizerVersion": "1.0.0",
+  "intents": [
+    {
+      "name": "Cancel"
+    },
+    {
+      "name": "Filter"
+    },
+    {
+      "name": "List"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "StartSearch"
+    }
+  ],
+  "entities": [
+    {
+      "name": "AttributeName",
+      "roles": []
+    },
+    {
+      "name": "AttributeValue",
+      "roles": []
+    },
+    {
+      "name": "InstanceOf",
+      "roles": []
+    }
+  ],
+  "composites": [],
+  "closedLists": [
+    {
+      "name": "CommonAttributes",
+      "subLists": [
+        {
+          "canonicalForm": "country of citizenship",
+          "list": []
+        },
+        {
+          "canonicalForm": "birth name",
+          "list": []
+        },
+        {
+          "canonicalForm": "given name",
+          "list": []
+        },
+        {
+          "canonicalForm": "family name",
+          "list": [
+            "surname"
+          ]
+        },
+        {
+          "canonicalForm": "date of birth",
+          "list": []
+        },
+        {
+          "canonicalForm": "place of birth",
+          "list": [
+            "birth place"
+          ]
+        },
+        {
+          "canonicalForm": "occupation",
+          "list": []
+        }
+      ],
+      "roles": []
+    }
+  ],
+  "patternAnyEntities": [],
+  "regex_entities": [],
+  "prebuiltEntities": [
+    {
+      "name": "datetimeV2",
+      "roles": []
+    }
+  ],
+  "model_features": [],
+  "regex_features": [],
+  "patterns": [],
+  "utterances": [
+    {
+      "text": "cancel.",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "end search",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "find me a food",
+      "intent": "StartSearch",
+      "entities": [
+        {
+          "entity": "InstanceOf",
+          "startPos": 10,
+          "endPos": 13
+        }
+      ]
+    },
+    {
+      "text": "get the weather",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "her surname is adams",
+      "intent": "Filter",
+      "entities": [
+        {
+          "entity": "AttributeValue",
+          "startPos": 15,
+          "endPos": 19
+        }
+      ]
+    },
+    {
+      "text": "his date of birth is 11 march 1952",
+      "intent": "Filter",
+      "entities": []
+    },
+    {
+      "text": "his occupation was writer",
+      "intent": "Filter",
+      "entities": [
+        {
+          "entity": "AttributeValue",
+          "startPos": 19,
+          "endPos": 24
+        }
+      ]
+    },
+    {
+      "text": "i am looking for a person.",
+      "intent": "StartSearch",
+      "entities": [
+        {
+          "entity": "InstanceOf",
+          "startPos": 19,
+          "endPos": 24
+        }
+      ]
+    },
+    {
+      "text": "i am searching for a person.",
+      "intent": "StartSearch",
+      "entities": [
+        {
+          "entity": "InstanceOf",
+          "startPos": 21,
+          "endPos": 26
+        }
+      ]
+    },
+    {
+      "text": "i want to find a car",
+      "intent": "StartSearch",
+      "entities": [
+        {
+          "entity": "InstanceOf",
+          "startPos": 17,
+          "endPos": 19
+        }
+      ]
+    },
+    {
+      "text": "i would like to find an animal",
+      "intent": "StartSearch",
+      "entities": [
+        {
+          "entity": "InstanceOf",
+          "startPos": 24,
+          "endPos": 29
+        }
+      ]
+    },
+    {
+      "text": "its color is black",
+      "intent": "Filter",
+      "entities": [
+        {
+          "entity": "AttributeName",
+          "startPos": 4,
+          "endPos": 8
+        },
+        {
+          "entity": "AttributeValue",
+          "startPos": 13,
+          "endPos": 17
+        }
+      ]
+    },
+    {
+      "text": "list",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "please list the results",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "query a country",
+      "intent": "StartSearch",
+      "entities": [
+        {
+          "entity": "InstanceOf",
+          "startPos": 8,
+          "endPos": 14
+        }
+      ]
+    },
+    {
+      "text": "quit",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "restart",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "results",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "show me the results",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "what did you found",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "what have you found",
+      "intent": "List",
+      "entities": []
+    },
+    {
+      "text": "what time is it",
+      "intent": "None",
+      "entities": []
+    }
+  ],
+  "settings": []
+}
