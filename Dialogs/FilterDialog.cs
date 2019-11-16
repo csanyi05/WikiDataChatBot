@@ -49,8 +49,8 @@ namespace WikiDataHelpDeskBot.Dialogs
             {
                 case WikiDataHelpDesk.Intent.Filter:
                     {
-                        var attributeName = (luisResult.Entities.CommonAttributes.FirstOrDefault() ?? luisResult.Entities.AttributeName).FirstOrDefault();
-                        var attributeValue = luisResult.Entities.datetime?.FirstOrDefault()?.Expressions.FirstOrDefault()?.Split('T')[0] ?? luisResult.Entities.AttributeValue.FirstOrDefault();
+                        var attributeName = (luisResult.Entities.CommonAttributes?.FirstOrDefault() ?? luisResult.Entities.AttributeName)?.FirstOrDefault();
+                        var attributeValue = luisResult.Entities.datetime?.FirstOrDefault()?.Expressions.FirstOrDefault()?.Split('T')[0] ?? luisResult.Entities.AttributeValue?.FirstOrDefault();
                         var searchParameters = (SearchParameters)stepContext.Options;
                         if (attributeName != null && attributeValue != null)
                         {
