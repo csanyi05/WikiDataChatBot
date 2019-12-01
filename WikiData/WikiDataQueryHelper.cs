@@ -46,24 +46,24 @@ namespace WikiDataHelpDeskBot.WikiData
         {
             var doc = await SendFilteresRequest(parameters, false);
             if (doc?.LastChild?.LastChild != null)
-                return Int32.Parse(doc.LastChild.LastChild.InnerText);
+                return doc.LastChild.LastChild.ChildNodes.Count;
             else
                 return 0;
         }
 
-        public async Task<List<string>> GetFilteredItemsLink(SearchParameters parameters)
+        public async Task<Dictionary<string, string>> GetFilteredItemsLink(SearchParameters parameters)
         {
             var doc = await SendFilteresRequest(parameters, true);
-            List<string> results = new List<string>();
+            Dictionary<string, string> results = new Dictionary<string, string>();
             if (doc?.LastChild?.LastChild != null)
             {
                 foreach (XmlNode result in doc.LastChild.LastChild.ChildNodes)
-                    results.Add(result.InnerText);
+                    results.Add(result.FirstChild.InnerText, result.LastChild.InnerText);
             }
             return results;
         }
 
-        public async Task<XmlDocument> SendFilteresRequest(SearchParameters parameters, bool listItems)
+        public async Task<XmlDocument> SendFilteresRequest(SearchParameters parameters, bool queryLabel)
         {
             if (string.IsNullOrEmpty(parameters.InstanceOf))
                 return null;
@@ -76,10 +76,16 @@ namespace WikiDataHelpDeskBot.WikiData
                 filterText += " " + String.Format(filterSkeleton, propertyId, "prop" + i, filter.Value);
                 i++;
             }
+            foreach (var filter in parameters.DateFilters)
+            {
+                var propertyId = await GetPropertyId(filter.Key);
+                filterText += " " + String.Format(filterSkeletonForDate, propertyId, "prop" + i, filter.Value.ToString("yyy-MM-dd"), filter.Value.AddDays(1).ToString("yyy-MM-dd"));
+                i++;
+            }
 
-            string requestUri;
-            if(!listItems)
-                requestUri = String.Format(getFilteredItemsCount, instanceOfId, filterText);
+            string requestUri; 
+            if (queryLabel)
+                requestUri = String.Format(listItemsWithLabelUri, instanceOfId, filterText);
             else
                 requestUri = String.Format(listItemsUri, instanceOfId, filterText);
             return await GetAnswerAsXmlDocument(requestUri);
@@ -114,10 +120,10 @@ namespace WikiDataHelpDeskBot.WikiData
         private const string getPropertyIdByNameUrl = "https://query.wikidata.org/sparql?query=SELECT ?property WHERE {{ ?property wikibase:propertyType ?propertyType . ?property rdfs:label ?propertyLabel. FILTER(ucase(?propertyLabel) = ucase(\"{0}\"@en)) .}}";
         private const string getPropertyAdByAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?property WHERE {{ ?property wikibase:propertyType ?propertyType. ?property skos:altLabel ?propertyAltLabel. FILTER(ucase(?propertyAltLabel) = ucase(\"{0}\"@en)) . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\". }} }}";
         private const string getItemIdByLabelOrAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:Q55983715 . ?item rdfs:label ?itemLabel . ?item skos:altLabel ?propertyAltLabel. FILTER(ucase(?itemLabel) = ucase('{0}'@en) || ucase(?propertyAltLabel) = ucase('{1}'@en)) SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}}";
-        private const string getItemsByInstanceOf = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:{0} . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}} LIMIT 100";
-        private const string getFilteredItemsCount = "https://query.wikidata.org/sparql?query=SELECT (count(distinct ?item) as ?count) WHERE {{ ?item wdt:P31 wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}}";
+        private const string filterSkeletonForDate = "?item wdt:{0} ?{1}. hint:Prior hint:rangeSafe true. FILTER(\"{2}\"^^xsd:dateTime <= ?{1} %26%26 ?{1} < \"{3}\"^^xsd:dateTime) .";
         private const string filterSkeleton = "?item wdt:{0} ?{1}. ?{1} rdfs:label ?{1}Label . FILTER(STRSTARTS(ucase(?{1}Label), ucase('{2}'))) .";
-        private const string listItemsUri = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}}";
+        private const string listItemsUri = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31/wdt:P279* wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}} LIMIT 50";
+        private const string listItemsWithLabelUri = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item ?itemLabel WHERE {{ ?item wdt:P31/wdt:P279* wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}} LIMIT 50";
 
         private static WikiDataQueryHelper instance = null;
         public static WikiDataQueryHelper Instance

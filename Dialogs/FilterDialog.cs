@@ -37,8 +37,12 @@ namespace WikiDataHelpDeskBot.Dialogs
             /*var promptMessage2 = MessageFactory.Text("Processing...", "Processing...", InputHints.ExpectingInput);
             await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage2 }, cancellationToken);*/
             var searchParameters = (SearchParameters)stepContext.Options;
-            var itemNum = await WikiDataQueryHelper.Instance.GetFilteredItemsNum(searchParameters);        
-            var messageText = $"We have found {itemNum} {searchParameters.InstanceOf.ToLower()}.";
+            var itemNum = await WikiDataQueryHelper.Instance.GetFilteredItemsNum(searchParameters);
+            string messageText;
+            if(itemNum == 50)
+                messageText = $"We have found more than {itemNum} {searchParameters.InstanceOf.ToLower()}.";
+            else
+                messageText = $"We have found {itemNum} {searchParameters.InstanceOf.ToLower()}.";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
         }
@@ -55,9 +59,21 @@ namespace WikiDataHelpDeskBot.Dialogs
                 case WikiDataHelpDesk.Intent.Filter:
                     {
                         var attributeName = (luisResult.Entities.CommonAttributes?.FirstOrDefault() ?? luisResult.Entities.AttributeName)?.FirstOrDefault();
-                        var attributeValue = luisResult.Entities.datetime?.FirstOrDefault()?.Expressions.FirstOrDefault()?.Split('T')[0] ?? luisResult.Entities.AttributeValue?.FirstOrDefault();
+                        var date = luisResult.Entities.datetime?.FirstOrDefault()?.Expressions.FirstOrDefault()?.Split('T')[0];
                         var searchParameters = (SearchParameters)stepContext.Options;
-                        if (attributeName != null && attributeValue != null)
+                        DateTime dateValue = DateTime.MinValue;
+                        if (date != null )
+                            dateValue = DateTime.Parse(date);
+
+                        var attributeValue = luisResult.Entities.AttributeValue?.FirstOrDefault();
+
+                        if (attributeName != null && dateValue != DateTime.MinValue)
+                        {
+                            if (searchParameters != null)
+                                if (!searchParameters.DateFilters.TryAdd(attributeName, dateValue))
+                                    searchParameters.DateFilters[attributeName] = dateValue;
+                        }
+                        else if (attributeName != null && attributeValue != null)
                         {
                             if (searchParameters != null)
                                 if (!searchParameters.Filters.TryAdd(attributeName, attributeValue))

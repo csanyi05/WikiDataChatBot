@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 
 using WikiDataHelpDeskBot.CognitiveModels;
+using WikiDataHelpDeskBot.WikiData;
 
 namespace WikiDataHelpDeskBot.Dialogs
 {
@@ -88,10 +89,11 @@ namespace WikiDataHelpDeskBot.Dialogs
         {
             if (stepContext.Result is SearchParameters result)
             {
-                var messageText = $"Element 1, element 2...{result.InstanceOf}";
-                foreach(var dicItem in result.Filters)
+                string messageText = string.Empty;
+                var resultLinks = await WikiDataQueryHelper.Instance.GetFilteredItemsLink(stepContext.Result as SearchParameters);
+                foreach (var link in resultLinks)
                 {
-                    messageText += dicItem.Key + dicItem.Value;
+                    messageText += $"{link.Key} ({link.Value})" + Environment.NewLine;
                 }
                 var message = MessageFactory.Text(messageText, messageText, InputHints.IgnoringInput);
                 await stepContext.Context.SendActivityAsync(message, cancellationToken);
