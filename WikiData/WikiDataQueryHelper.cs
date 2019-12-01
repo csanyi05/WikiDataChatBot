@@ -36,7 +36,7 @@ namespace WikiDataHelpDeskBot.WikiData
             }
         }
 
-        public async Task<string> GetItemByLabelOrAlsoKnownAs(string itemName)
+        public async Task<string> GetItemIdByLabelOrAlsoKnownAs(string itemName)
         {
             XmlDocument mainAnswerDoc = await GetAnswerAsXmlDocument(string.Format(getItemIdByLabelOrAlsoKnownAsUrl, itemName, itemName));
             return getPropertyIdFromAnswerXml(mainAnswerDoc);
@@ -48,6 +48,49 @@ namespace WikiDataHelpDeskBot.WikiData
             if (mainAnswerDoc?.LastChild?.LastChild != null)
                 return mainAnswerDoc.LastChild.LastChild.ChildNodes.Count;
             else return 0;
+        }
+
+        public async Task<int> GetFilteredItemsNum(SearchParameters parameters)
+        {
+            var doc = await SendFilteresRequest(parameters, false);
+            if (doc?.LastChild?.LastChild != null)
+                return Int32.Parse(doc.LastChild.LastChild.InnerText);
+            else
+                return 0;
+        }
+
+        public async Task<List<string>> GetFilteredItemsLink(SearchParameters parameters)
+        {
+            var doc = await SendFilteresRequest(parameters, true);
+            List<string> results = new List<string>();
+            if (doc?.LastChild?.LastChild != null)
+            {
+                foreach (XmlNode result in doc.LastChild.LastChild.ChildNodes)
+                    results.Add(result.InnerText);
+            }
+            return results;
+        }
+
+        public async Task<XmlDocument> SendFilteresRequest(SearchParameters parameters, bool listItems)
+        {
+            if (string.IsNullOrEmpty(parameters.InstanceOf))
+                return null;
+            var instanceOfId = await GetItemIdByLabelOrAlsoKnownAs(parameters.InstanceOf);
+            string filterText = string.Empty;
+            int i = 0;
+            foreach (var filter in parameters.Filters)
+            {
+                var propertyId = await GetPropertyId(filter.Key);
+                filterText += " " + String.Format(filterSkeleton, propertyId, "prop" + i, filter.Value);
+                i++;
+            }
+
+            string requestUri;
+            if(!listItems)
+                requestUri = String.Format(getFilteredItemsCount, instanceOfId, filterText);
+            else
+                requestUri = String.Format(listItemsUri, instanceOfId, filterText);
+            return await GetAnswerAsXmlDocument(requestUri);
         }
 
         private string getPropertyIdFromAnswerXml(XmlDocument doc)
@@ -76,12 +119,13 @@ namespace WikiDataHelpDeskBot.WikiData
 
         private static readonly object padlock = new object();
         private readonly HttpClient client;
-        private static string instanceOfPropertyId = "P31";
-        private static string humenObjectId = "Q5";
-        private const string getPropertyIdByNameUrl = "https://query.wikidata.org/sparql?query=SELECT ?property WHERE {{ ?property wikibase:propertyType ?propertyType . ?property rdfs:label ?propertyLabel. FILTER(?propertyLabel = \"{0}\"@en) .}}";
-        private const string getPropertyAdByAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?property WHERE {{ ?property wikibase:propertyType ?propertyType. ?property skos:altLabel ?propertyAltLabel. FILTER(?propertyAltLabel = \"{0}\"@en) . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\". }} }}";
-        private const string getItemIdByLabelOrAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:Q55983715 . ?item rdfs:label ?itemLabel . ?item skos:altLabel ?propertyAltLabel. FILTER(?itemLabel = '{0}'@en || ?propertyAltLabel = '{1}'@en) SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}}";
+        private const string getPropertyIdByNameUrl = "https://query.wikidata.org/sparql?query=SELECT ?property WHERE {{ ?property wikibase:propertyType ?propertyType . ?property rdfs:label ?propertyLabel. FILTER(ucase(?propertyLabel) = ucase(\"{0}\"@en)) .}}";
+        private const string getPropertyAdByAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?property WHERE {{ ?property wikibase:propertyType ?propertyType. ?property skos:altLabel ?propertyAltLabel. FILTER(ucase(?propertyAltLabel) = ucase(\"{0}\"@en)) . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\". }} }}";
+        private const string getItemIdByLabelOrAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:Q55983715 . ?item rdfs:label ?itemLabel . ?item skos:altLabel ?propertyAltLabel. FILTER(ucase(?itemLabel) = ucase('{0}'@en) || ucase(?propertyAltLabel) = ucase('{1}'@en)) SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}}";
         private const string getItemsByInstanceOf = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:{0} . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}} LIMIT 100";
+        private const string getFilteredItemsCount = "https://query.wikidata.org/sparql?query=SELECT (count(distinct ?item) as ?count) WHERE {{ ?item wdt:P31 wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}}";
+        private const string filterSkeleton = "?item wdt:{0} ?{1}. ?{1} rdfs:label ?{1}Label . FILTER(STRSTARTS(ucase(?{1}Label), ucase('{2}'))) .";
+        private const string listItemsUri = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}}";
 
         private static WikiDataQueryHelper instance = null;
         public static WikiDataQueryHelper Instance
