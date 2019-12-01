@@ -37,12 +37,19 @@ namespace WikiDataHelpDeskBot.Dialogs
             /*var promptMessage2 = MessageFactory.Text("Processing...", "Processing...", InputHints.ExpectingInput);
             await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage2 }, cancellationToken);*/
             var searchParameters = (SearchParameters)stepContext.Options;
-            var itemNum = await WikiDataQueryHelper.Instance.GetFilteredItemsNum(searchParameters);
             string messageText;
-            if(itemNum == 50000)
-                messageText = $"We have found more than {itemNum} {searchParameters.InstanceOf.ToLower()}.";
+            if (!String.IsNullOrEmpty(searchParameters.ExtraMessage))
+            {
+                messageText = searchParameters.ExtraMessage;
+            }
             else
-                messageText = $"We have found {itemNum} {searchParameters.InstanceOf.ToLower()}.";
+            {
+                var itemNum = await WikiDataQueryHelper.Instance.GetFilteredItemsNum(searchParameters);
+                if (itemNum == 50000)
+                    messageText = $"We have found more than {itemNum} {searchParameters.InstanceOf.ToLower()}.";
+                else
+                    messageText = $"We have found {itemNum} {searchParameters.InstanceOf.ToLower()}.";
+            }
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
         }
@@ -61,9 +68,15 @@ namespace WikiDataHelpDeskBot.Dialogs
                         var attributeName = (luisResult.Entities.CommonAttributes?.FirstOrDefault() ?? luisResult.Entities.AttributeName)?.FirstOrDefault();
                         var date = luisResult.Entities.datetime?.FirstOrDefault()?.Expressions.FirstOrDefault()?.Split('T')[0];
                         var searchParameters = (SearchParameters)stepContext.Options;
+                        searchParameters.ExtraMessage = "";
                         DateTime dateValue = DateTime.MinValue;
                         if (date != null )
-                            dateValue = DateTime.Parse(date);
+                        {
+                            if (!DateTime.TryParse(date, out dateValue))
+                            {
+                                searchParameters.ExtraMessage = "Please enter a date with month, day and year.";
+                            }
+                        }
 
                         var attributeValue = luisResult.Entities.AttributeValue?.FirstOrDefault();
                         
@@ -82,6 +95,10 @@ namespace WikiDataHelpDeskBot.Dialogs
                                 if (!searchParameters.Filters.TryAdd(attributeName, attributeValue))
                                     searchParameters.Filters[attributeName] = attributeValue;
                         }
+                        else if (attributeName == null)
+                        {
+                            searchParameters.ExtraMessage = "Sorry we couldn't recognize the new search filter.";
+                        }
 
                         return await stepContext.ReplaceDialogAsync(nameof(FilterDialog), searchParameters, cancellationToken);
                     }
@@ -98,6 +115,8 @@ namespace WikiDataHelpDeskBot.Dialogs
                 case WikiDataHelpDesk.Intent.None:
                 default:
                     {
+                        var searchParameters = (SearchParameters)stepContext.Options;
+                        searchParameters.ExtraMessage = "Sorry we couldn't recognize the new search filter.";
                         return await stepContext.ReplaceDialogAsync(nameof(FilterDialog), (SearchParameters)stepContext.Options, cancellationToken);
                     }
             }
