@@ -42,6 +42,14 @@ namespace WikiDataHelpDeskBot.WikiData
             return getPropertyIdFromAnswerXml(mainAnswerDoc);
         }
 
+        public async Task<int> getItemNumInstanceOfs(string instanceOfId)
+        {
+            XmlDocument mainAnswerDoc = await GetAnswerAsXmlDocument(string.Format(getItemsByInstanceOf, instanceOfId));
+            if (mainAnswerDoc?.LastChild?.LastChild != null)
+                return mainAnswerDoc.LastChild.LastChild.ChildNodes.Count;
+            else return 0;
+        }
+
         private string getPropertyIdFromAnswerXml(XmlDocument doc)
         {
             try
@@ -73,6 +81,7 @@ namespace WikiDataHelpDeskBot.WikiData
         private const string getPropertyIdByNameUrl = "https://query.wikidata.org/sparql?query=SELECT ?property WHERE {{ ?property wikibase:propertyType ?propertyType . ?property rdfs:label ?propertyLabel. FILTER(?propertyLabel = \"{0}\"@en) .}}";
         private const string getPropertyAdByAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?property WHERE {{ ?property wikibase:propertyType ?propertyType. ?property skos:altLabel ?propertyAltLabel. FILTER(?propertyAltLabel = \"{0}\"@en) . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\". }} }}";
         private const string getItemIdByLabelOrAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:Q55983715 . ?item rdfs:label ?itemLabel . ?item skos:altLabel ?propertyAltLabel. FILTER(?itemLabel = '{0}'@en || ?propertyAltLabel = '{1}'@en) SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}}";
+        private const string getItemsByInstanceOf = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:{0} . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}} LIMIT 100";
 
         private static WikiDataQueryHelper instance = null;
         public static WikiDataQueryHelper Instance
