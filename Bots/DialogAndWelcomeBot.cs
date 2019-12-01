@@ -28,7 +28,9 @@ namespace WikiDataHelpDeskBot.Bots
         {
             // for test only
             var id = await WikiDataQueryHelper.Instance.GetPropertyId("son of");
+            var id2 = await WikiDataQueryHelper.Instance.GetItemByLabelOrAlsoKnownAs("person");
 
+            
             foreach (var member in membersAdded)
             {
                 // Greet anyone that was not the target (recipient) of this message.

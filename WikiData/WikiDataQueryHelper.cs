@@ -13,6 +13,7 @@ namespace WikiDataHelpDeskBot.WikiData
         {
             client = new HttpClient();
             client.DefaultRequestHeaders.Add("Accept", "*/*");
+            client.DefaultRequestHeaders.Add("User-Agent", "PostmanRuntime/7.20.1");
         }
 
         public async Task<string> GetPropertyId(string propertyName)
@@ -23,6 +24,7 @@ namespace WikiDataHelpDeskBot.WikiData
             {
                 return mainProperty;
             }
+            // olyan propertyt keresünk aminek az egyik szinonímája az adott szó
             else
             {
                 XmlDocument answerDoc = await GetAnswerAsXmlDocument(string.Format(getPropertyAdByAlsoKnownAsUrl, propertyName));
@@ -32,6 +34,12 @@ namespace WikiDataHelpDeskBot.WikiData
                 else
                     throw new PropertyNotFoundException();
             }
+        }
+
+        public async Task<string> GetItemByLabelOrAlsoKnownAs(string itemName)
+        {
+            XmlDocument mainAnswerDoc = await GetAnswerAsXmlDocument(string.Format(getItemIdByLabelOrAlsoKnownAsUrl, itemName, itemName));
+            return getPropertyIdFromAnswerXml(mainAnswerDoc);
         }
 
         private string getPropertyIdFromAnswerXml(XmlDocument doc)
@@ -64,7 +72,7 @@ namespace WikiDataHelpDeskBot.WikiData
         private static string humenObjectId = "Q5";
         private const string getPropertyIdByNameUrl = "https://query.wikidata.org/sparql?query=SELECT ?property WHERE {{ ?property wikibase:propertyType ?propertyType . ?property rdfs:label ?propertyLabel. FILTER(?propertyLabel = \"{0}\"@en) .}}";
         private const string getPropertyAdByAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?property WHERE {{ ?property wikibase:propertyType ?propertyType. ?property skos:altLabel ?propertyAltLabel. FILTER(?propertyAltLabel = \"{0}\"@en) . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\". }} }}";
-        private Dictionary<string, string> propertyIds = new Dictionary<string, string>();
+        private const string getItemIdByLabelOrAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:Q55983715 . ?item rdfs:label ?itemLabel . ?item skos:altLabel ?propertyAltLabel. FILTER(?itemLabel = '{0}'@en || ?propertyAltLabel = '{1}'@en) SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}}";
 
         private static WikiDataQueryHelper instance = null;
         public static WikiDataQueryHelper Instance
