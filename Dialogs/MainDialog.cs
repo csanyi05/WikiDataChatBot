@@ -48,7 +48,7 @@ namespace WikiDataHelpDeskBot.Dialogs
             }
 
             // Use the text provided in FinalStepAsync or the default if it is the first time.
-            var messageText = stepContext.Options?.ToString() ?? "How can I help you?\nSay something like \"I'm looking for a person.\"";
+            var messageText = stepContext.Options?.ToString() ?? "Helo! How can I help you?\nSay something like \"I'm looking for a person.\"";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
         }
