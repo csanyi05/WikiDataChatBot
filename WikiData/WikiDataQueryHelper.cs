@@ -42,14 +42,6 @@ namespace WikiDataHelpDeskBot.WikiData
             return getPropertyIdFromAnswerXml(mainAnswerDoc);
         }
 
-        public async Task<int> getItemNumInstanceOfs(string instanceOfId)
-        {
-            XmlDocument mainAnswerDoc = await GetAnswerAsXmlDocument(string.Format(getItemsByInstanceOf, instanceOfId));
-            if (mainAnswerDoc?.LastChild?.LastChild != null)
-                return mainAnswerDoc.LastChild.LastChild.ChildNodes.Count;
-            else return 0;
-        }
-
         public async Task<int> GetFilteredItemsNum(SearchParameters parameters)
         {
             var doc = await SendFilteresRequest(parameters, false);

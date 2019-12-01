@@ -26,16 +26,6 @@ namespace WikiDataHelpDeskBot.Bots
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
-            // for test only
-            // var id = await WikiDataQueryHelper.Instance.GetPropertyId("son of");
-            // var id2 = await WikiDataQueryHelper.Instance.GetItemIdByLabelOrAlsoKnownAs("person");
-            // var id3 = await WikiDataQueryHelper.Instance.getItemNumInstanceOfs(id2);
-            var parameters = new SearchParameters();
-            parameters.InstanceOf = "person";
-            parameters.Filters.Add("mother", "Michelle");
-            parameters.Filters.Add("father", "jorge");
-            var s = await WikiDataQueryHelper.Instance.GetFilteredItemsLink(parameters);
-
             foreach (var member in membersAdded)
             {
                 // Greet anyone that was not the target (recipient) of this message.

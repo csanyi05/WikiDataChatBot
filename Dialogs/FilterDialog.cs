@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WikiDataHelpDeskBot.CognitiveModels;
+using WikiDataHelpDeskBot.WikiData;
 
 namespace WikiDataHelpDeskBot.Dialogs
 {
@@ -33,7 +34,11 @@ namespace WikiDataHelpDeskBot.Dialogs
             WaterfallStepContext stepContext,
             CancellationToken cancellationToken)
         {
-            var messageText = "5 db ilyen elem van";
+            /*var promptMessage2 = MessageFactory.Text("Processing...", "Processing...", InputHints.ExpectingInput);
+            await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage2 }, cancellationToken);*/
+            var searchParameters = (SearchParameters)stepContext.Options;
+            var itemNum = await WikiDataQueryHelper.Instance.GetFilteredItemsNum(searchParameters);        
+            var messageText = $"We have found {itemNum} {searchParameters.InstanceOf.ToLower()}.";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
         }
