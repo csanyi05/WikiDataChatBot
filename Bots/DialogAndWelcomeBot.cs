@@ -12,6 +12,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using WikiDataHelpDeskBot.WikiData;
 
 namespace WikiDataHelpDeskBot.Bots
 {
@@ -25,6 +26,9 @@ namespace WikiDataHelpDeskBot.Bots
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
+            // for test only
+            var id = await WikiDataQueryHelper.Instance.GetPropertyId("son of");
+
             foreach (var member in membersAdded)
             {
                 // Greet anyone that was not the target (recipient) of this message.
