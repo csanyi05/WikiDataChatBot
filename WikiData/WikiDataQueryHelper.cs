@@ -121,8 +121,8 @@ namespace WikiDataHelpDeskBot.WikiData
         private const string getPropertyAdByAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?property WHERE {{ ?property wikibase:propertyType ?propertyType. ?property skos:altLabel ?propertyAltLabel. FILTER(ucase(?propertyAltLabel) = ucase(\"{0}\"@en)) . SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\". }} }}";
         private const string getItemIdByLabelOrAlsoKnownAsUrl = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31 wd:Q55983715 . ?item rdfs:label ?itemLabel . ?item skos:altLabel ?propertyAltLabel. FILTER(ucase(?itemLabel) = ucase('{0}'@en) || ucase(?propertyAltLabel) = ucase('{1}'@en)) SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\"}}}}";
         private const string filterSkeletonForDate = "?item wdt:{0} ?{1}. hint:Prior hint:rangeSafe true. FILTER(\"{2}\"^^xsd:dateTime <= ?{1} %26%26 ?{1} < \"{3}\"^^xsd:dateTime) .";
-        private const string filterSkeleton = "?item wdt:{0} ?{1}. ?{1} rdfs:label ?{1}Label . FILTER(STRSTARTS(ucase(?{1}Label), ucase('{2}'))) .";
-        private const string listItemsUri = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31/wdt:P279* wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}} LIMIT 50";
+        private const string filterSkeleton = "?item wdt:{0} ?{1}. ?{1} ?{1}Label '{2}'@en.";
+        private const string listItemsUri = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item WHERE {{ ?item wdt:P31/wdt:P279* wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}} LIMIT 50000";
         private const string listItemsWithLabelUri = "https://query.wikidata.org/sparql?query=SELECT DISTINCT ?item ?itemLabel WHERE {{ ?item wdt:P31/wdt:P279* wd:{0} . {1} SERVICE wikibase:label {{ bd:serviceParam wikibase:language \"en\" }}}} LIMIT 50";
 
         private static WikiDataQueryHelper instance = null;

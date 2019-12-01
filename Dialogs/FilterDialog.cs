@@ -39,7 +39,7 @@ namespace WikiDataHelpDeskBot.Dialogs
             var searchParameters = (SearchParameters)stepContext.Options;
             var itemNum = await WikiDataQueryHelper.Instance.GetFilteredItemsNum(searchParameters);
             string messageText;
-            if(itemNum == 50)
+            if(itemNum == 50000)
                 messageText = $"We have found more than {itemNum} {searchParameters.InstanceOf.ToLower()}.";
             else
                 messageText = $"We have found {itemNum} {searchParameters.InstanceOf.ToLower()}.";
@@ -66,6 +66,7 @@ namespace WikiDataHelpDeskBot.Dialogs
                             dateValue = DateTime.Parse(date);
 
                         var attributeValue = luisResult.Entities.AttributeValue?.FirstOrDefault();
+                        
 
                         if (attributeName != null && dateValue != DateTime.MinValue)
                         {
@@ -75,6 +76,8 @@ namespace WikiDataHelpDeskBot.Dialogs
                         }
                         else if (attributeName != null && attributeValue != null)
                         {
+                            int indexOfValue = luisResult.Text.ToLower().IndexOf(attributeValue.ToLower());
+                            attributeValue = luisResult.Text.Substring(indexOfValue, attributeValue.Length);
                             if (searchParameters != null)
                                 if (!searchParameters.Filters.TryAdd(attributeName, attributeValue))
                                     searchParameters.Filters[attributeName] = attributeValue;
