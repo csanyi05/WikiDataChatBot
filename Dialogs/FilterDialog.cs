@@ -47,6 +47,8 @@ namespace WikiDataHelpDeskBot.Dialogs
                 var itemNum = await WikiDataQueryHelper.Instance.GetFilteredItemsNum(searchParameters);
                 if (itemNum == 50000)
                     messageText = $"We have found more than {itemNum} {searchParameters.InstanceOf.ToLower()}.";
+                else if (itemNum == 0)
+                    messageText = $"We didn't find any matching {searchParameters.InstanceOf.ToLower()}.";
                 else
                     messageText = $"We have found {itemNum} {searchParameters.InstanceOf.ToLower()}.";
             }
